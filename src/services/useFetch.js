@@ -11,6 +11,7 @@ export default function useFetch(url) {
     async function init() {
       try {
         const response = await fetch(baseUrl + url);
+
         if (response.ok) {
           const json = await response.json();
           setData(json);
@@ -26,5 +27,5 @@ export default function useFetch(url) {
     init();
   }, [url]);
 
-  return data, error, loading;
+  return { data, error, loading };
 }

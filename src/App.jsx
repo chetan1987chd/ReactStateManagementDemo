@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import Footer from "./Footer";
 import Header from "./Header";
-import { getProducts } from "./services/productService";
 import Spinner from "./Spinner";
 import useFetch from "./services/useFetch";
 
@@ -11,22 +10,8 @@ export default function App() {
   const {
     data: products,
     loading,
-    error,
-  } = useFetch("products?category=shows");
-
-  useEffect(() => {
-    async function init() {
-      try {
-        const response = await getProducts("shoes");
-        setProducts(response);
-      } catch (e) {
-        setError(e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    init();
-  }, []);
+    error
+  } = useFetch("products?category=shoes");
 
   const filteredProds = size
     ? products.filter((x) => x.skus.find((s) => s.size === parseInt(size)))
