@@ -8,6 +8,7 @@ import Detail from "./Detail";
 import Cart from "./Cart";
 import { useState } from "react";
 import { useEffect } from "react";
+import Checkout from "./Checkout";
 
 
 export default function App() {
@@ -48,6 +49,10 @@ export default function App() {
     })
   }
 
+  function emptyCart() {
+    setCart([]);
+  }
+
 
   return (
     <>
@@ -59,6 +64,7 @@ export default function App() {
             <Route path="/:category" element={<Products />} />
             <Route path="/:category/:id" element={<Detail addToCart={addToCart} />} />
             <Route path="/cart" element={<Cart cart={cart} updateQty={updateQuantity} />} />
+            <Route path="/checkout" element={<Checkout cart={cart} emptyCart={emptyCart} />} />
           </Routes>
         </main>
       </div>
