@@ -1,61 +1,56 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
-import Footer from "./Footer";
+import Products from "./Products";
 import Header from "./Header";
-import Spinner from "./Spinner";
-import useFetch from "./services/useFetch";
+import Footer from "./Footer";
+import { Route, Routes } from "react-router-dom";
+import Detail from "./Detail";
+import Cart from "./Cart";
+import { useState } from "react";
+
 
 export default function App() {
-  const [size, setSize] = useState("");
-  const {
-    data: products,
-    loading,
-    error
-  } = useFetch("products?category=shoes");
 
-  const filteredProds = size
-    ? products.filter((x) => x.skus.find((s) => s.size === parseInt(size)))
-    : products;
+  const [cart, setCart] = useState([]);
 
-  function renderProduct(p) {
-    return (
-      <div key={p.id} className="product">
-        <a href="/">
-          <img src={`/images/${p.image}`} alt={p.name} />
-          <h3>{p.name}</h3>
-          <p>${p.price}</p>
-        </a>
-      </div>
-    );
+  function addToCart(id, sku) {
+    setCart((items) => {
+      const itemsInCart = items.find((i) => i.sku === sku);
+      if (itemsInCart) {
+        return items.map((i) =>
+          i.sku === sku ? { ...i, quantity: i.quantity + 1 } : i
+        );
+      }
+      else {
+        return [...items, { id, sku, quantity: 1 }]
+      }
+    });
   }
 
-  //if (error) throw error;
+  function updateQuantity(sku, quantity) {
+    setCart((items) => {
+      if (quantity == 0) {
+        return items.filter((i) => i.sku !== sku);
+      }
+      return items.map((i) => i.sku === sku ? { ...i, quantity: quantity } : i);
+    })
+  }
 
-  if (loading) return <Spinner></Spinner>;
 
   return (
     <>
       <div className="content">
         <Header />
         <main>
-          <section id="filters">
-            <label htmlFor="size">Filter by Size:</label>{" "}
-            <select
-              id="size"
-              value={size}
-              onChange={(e) => setSize(e.target.value)}
-            >
-              <option value="">All sizes</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select>
-            {size && <h2>Found {filteredProds.length} products</h2>}
-          </section>
-          <section id="products">{filteredProds.map(renderProduct)}</section>
+          <Routes>
+            <Route path="/" element={<h1>Welcome to my app</h1>} />
+            <Route path="/:category" element={<Products />} />
+            <Route path="/:category/:id" element={<Detail addToCart={addToCart} />} />
+            <Route path="/cart" element={<Cart cart={cart} updateQty={updateQuantity} />} />
+          </Routes>
         </main>
       </div>
       <Footer />
     </>
-  );
+  )
 }
