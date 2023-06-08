@@ -18,6 +18,11 @@ const emptyAddress = {
 export default function Checkout({ cart, emptyCart }) {
     const [address, setAddress] = useState(emptyAddress);
     const [status, setStatus] = useState(STATUS.IDLE);
+    const [touched, setTouched] = useState({});
+
+    //Dervied state
+    const errors = getFormErrors(address);
+    const isFormValid = Object.keys(errors).length === 0;
 
     function handleChange(e) {
         e.persist(); //persist the event
@@ -26,22 +31,37 @@ export default function Checkout({ cart, emptyCart }) {
         });
     }
 
+    function getFormErrors(address) {
+        const result = {};
+        if (!address.city) result.city = "City is required";
+        if (!address.country) result.country = "Country is required";
+        return result;
+    }
+
     function handleBlur(event) {
-        // TODO
+        setTouched((control) => {
+            return { ...control, [event.target.id]: true };
+        })
     }
 
     async function handleSubmit(event) {
         event.preventDefault();
         setStatus(STATUS.SUBMITING);
-        try {
 
-            await saveShippingAddress(address);
-            emptyCart();
-        } catch (error) {
-            console.log(error);
+        if (isFormValid) {
+            try {
+
+                await saveShippingAddress(address);
+                emptyCart();
+            } catch (error) {
+                console.log(error);
+            }
+            finally {
+                setStatus(STATUS.COMPLETED)
+            }
         }
-        finally {
-            setStatus(STATUS.COMPLETED)
+        else {
+            setStatus(STATUS.SUBMITTED);
         }
     }
 
@@ -52,6 +72,20 @@ export default function Checkout({ cart, emptyCart }) {
     return (
         <>
             <h1>Shipping Info</h1>
+            {
+                !isFormValid && status === STATUS.SUBMITTED &&
+                (
+                    <div role="alert">
+                        <p>Please fix following errors</p>
+                        <ul>
+                            {Object.keys(errors).map((key) => {
+                                return <li key={key}>{errors[key]}</li>
+                            })}
+                        </ul>
+                    </div>
+
+                )
+            }
             <form onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="city">City</label>
@@ -60,9 +94,12 @@ export default function Checkout({ cart, emptyCart }) {
                         id="city"
                         type="text"
                         value={address.city}
-                        onBlur={handleBlur}
+                        //onBlur={handleBlur}
                         onChange={handleChange}
                     />
+                    <p role="alert">
+                        {(touched.city || status === STATUS.SUBMITING) && errors.city}
+                    </p>
                 </div>
 
                 <div>
@@ -71,7 +108,7 @@ export default function Checkout({ cart, emptyCart }) {
                     <select
                         id="country"
                         value={address.country}
-                        onBlur={handleBlur}
+                        //onBlur={handleBlur}
                         onChange={handleChange}
                     >
                         <option value="">Select Country</option>
@@ -80,6 +117,9 @@ export default function Checkout({ cart, emptyCart }) {
                         <option value="United Kingdom">United Kingdom</option>
                         <option value="USA">USA</option>
                     </select>
+                    {/* <p role="alert">
+                        {(touched.country || status === STATUS.SUBMITING) && errors.country}
+                    </p> */}
                 </div>
 
                 <div>
