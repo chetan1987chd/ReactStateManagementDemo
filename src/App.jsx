@@ -7,11 +7,23 @@ import { Route, Routes } from "react-router-dom";
 import Detail from "./Detail";
 import Cart from "./Cart";
 import { useState } from "react";
+import { useEffect } from "react";
 
 
 export default function App() {
 
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("cart")) ?? [];
+    } catch (error) {
+      console.error('The cart data cannot be parse');
+      return [];
+    }
+  });
+
+  useEffect(() =>
+    localStorage.setItem("cart", JSON.stringify(cart)), [cart]
+  );
 
   function addToCart(id, sku) {
     setCart((items) => {
