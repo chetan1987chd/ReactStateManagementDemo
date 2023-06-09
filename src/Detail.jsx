@@ -4,12 +4,14 @@ import useFetch from "./services/useFetch";
 import Spinner from "./Spinner";
 import PageNotFound from "./PageNotFound";
 import { useState } from "react";
+import { useCart } from "./cartContext";
 
-export default function Detail(props) {
+export default function Detail() {
 
     const { id } = useParams();
     const [sku, setSku] = useState();
     const navigate = useNavigate();
+    const { dispatch } = useCart();
 
     const { data: product, loading, error } = useFetch(`products/${id}`);
 
@@ -38,7 +40,7 @@ export default function Detail(props) {
             <p>
                 <button disabled={!sku} className="btn btn-primary"
                     onClick={() => {
-                        props.dispatch({ type: "add", id, sku })
+                        dispatch({ type: "add", id, sku })
                         navigate('/cart')
                     }}>Add to cart</button>
             </p>

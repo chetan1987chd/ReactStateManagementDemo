@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { saveShippingAddress } from './services/shippingService'
+import { useCart } from "./cartContext";
 
 const STATUS =
 {
@@ -15,11 +16,11 @@ const emptyAddress = {
     country: "",
 };
 
-export default function Checkout({ cart, dispatch }) {
+export default function Checkout() {
     const [address, setAddress] = useState(emptyAddress);
     const [status, setStatus] = useState(STATUS.IDLE);
     const [touched, setTouched] = useState({});
-
+    const { cart, dispatch } = useCart();
     //Dervied state
     const errors = getFormErrors(address);
     const isFormValid = Object.keys(errors).length === 0;
