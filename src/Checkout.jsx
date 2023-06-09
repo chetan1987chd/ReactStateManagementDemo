@@ -15,7 +15,7 @@ const emptyAddress = {
     country: "",
 };
 
-export default function Checkout({ cart, emptyCart }) {
+export default function Checkout({ cart, dispatch }) {
     const [address, setAddress] = useState(emptyAddress);
     const [status, setStatus] = useState(STATUS.IDLE);
     const [touched, setTouched] = useState({});
@@ -52,7 +52,7 @@ export default function Checkout({ cart, emptyCart }) {
             try {
 
                 await saveShippingAddress(address);
-                emptyCart();
+                dispatch({ type: "empty" });
             } catch (error) {
                 console.log(error);
             }
